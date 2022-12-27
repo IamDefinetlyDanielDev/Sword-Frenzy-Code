@@ -1,0 +1,67 @@
+--- DataStores
+
+local Datastore = game:GetService("DataStoreService")
+local CoinsDatastore = Datastore:GetDataStore("Coins")
+local TechniqueDatastore = Datastore:GetDataStore("Technique")
+local GemsDatastore = Datastore:GetDataStore("Gems")
+local KillsDatastore = Datastore:GetDataStore("Kills")
+local DeathsDatastore = Datastore:GetDataStore("Deaths")
+
+game.Players.PlayerAdded:Connect(function(plr)
+	plr.CharacterAdded:Connect(function()
+		
+			local StatFolder = Instance.new("Folder")
+			StatFolder.Name = "StatFolder"
+			StatFolder.Parent = plr
+			
+			local Gems = Instance.new("IntValue")
+			Gems.Name = "Gems"
+			Gems.Value = GemsDatastore:GetAsync(plr.UserId) or 0
+			Gems.Parent = StatFolder
+			
+			local Coins = Instance.new("IntValue")
+			Coins.Name = "Coins"
+			Coins.Value = CoinsDatastore:GetAsync(plr.UserId) or 0
+			Coins.Parent = StatFolder
+			
+			local Technique = Instance.new("IntValue")
+			Technique.Name = "Technique"
+			Technique.Value = TechniqueDatastore:GetAsync(plr.UserId) or 0
+			Technique.Parent = StatFolder
+			
+			local TotalDeaths = Instance.new("IntValue")
+			TotalDeaths.Name = "TotalDeaths"
+			TotalDeaths.Value = DeathsDatastore:GetAsync(plr.UserId) or 0
+			TotalDeaths.Parent = StatFolder
+			
+			local TotalKills = Instance.new("IntValue")
+			TotalKills.Name = "TotalKills"
+			TotalKills.Value = KillsDatastore:GetAsync(plr.UserId) or 0
+			TotalKills.Parent = StatFolder
+			
+			local Kills = Instance.new("IntValue")
+			Kills.Value = 0
+			Kills.Name = "Kills"
+			Kills.Parent = StatFolder
+			
+			local Deaths = Instance.new("IntValue")
+			Deaths.Name = "Deaths"
+			Deaths.Value = 0
+			Deaths.Parent = StatFolder	
+			
+			game.Players.PlayerRemoving:Connect(function(plr)
+				local success, errorMessage = pcall(function()
+					GemsDatastore:SetAsync(plr.Name,Gems.Value)
+					CoinsDatastore:SetAsync(plr.Name,Coins.Value)
+					TechniqueDatastore:SetAsync(plr.Name,Technique.Value)
+					KillsDatastore:SetAsync(plr.Name,TotalKills.Value + Kills.Value)
+					DeathsDatastore:SetAsync(plr.Name,TotalDeaths.Value + Deaths.Value )
+				end)
+				if not success then
+					print(errorMessage)
+				else
+					warn("Players Data Has been Saved")
+				end
+			end)
+		end)
+end)
